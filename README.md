@@ -59,8 +59,8 @@ gh secret set WINDOWS_CERTIFICATE_PASSWORD -R virtual-hippo/hello-tauri2 < pfx-p
 )
 ```
 
-`key.pem` は暗号化されていない秘密鍵で、`cert.pfx` と `pfx-password.txt` が揃っても秘密鍵を取り出せる。WSL のバックアップや export にはこれらも含まれる。証明書は作り直せるので、Secret の登録後にローカルで保管する必要がなければ削除する。
+`key.pem` は暗号化されていない秘密鍵で、`cert.pfx` も `pfx-password.txt` と揃えば秘密鍵を取り出せる。WSL のバックアップや export にはこれらも含まれる。証明書は作り直せるので、Secret の登録後にローカルで保管する必要がなければ削除する。
 
 ```sh
-rm ~/.secrets/hello-tauri/{key.pem,cert.pfx,cert.pfx.b64,pfx-password.txt}
+(cd ~/.secrets/hello-tauri && rm -f key.pem cert.pfx cert.pfx.b64 pfx-password.txt)
 ```
