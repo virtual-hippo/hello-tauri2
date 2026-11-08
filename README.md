@@ -40,7 +40,10 @@ Secret が無い場合は署名なしでビルドする。
 
 ### 証明書の再作成
 
+`umask` と `cd` を手元のシェルに残さないよう、サブシェルで実行する。
+
 ```sh
+(
 D=~/.secrets/hello-tauri; mkdir -p "$D"; chmod 700 ~/.secrets "$D"; cd "$D"; umask 077
 openssl rand -base64 24 | tr -d '\n' > pfx-password.txt
 openssl req -x509 -newkey rsa:3072 -sha256 -days 1095 -nodes -keyout key.pem -out cert.pem \
@@ -51,6 +54,13 @@ openssl pkcs12 -export -inkey key.pem -in cert.pem -out cert.pfx -passout file:p
   -keypbe AES-256-CBC -certpbe AES-256-CBC -macalg sha256
 openssl x509 -in cert.pem -outform der -out cert.cer   # 公開鍵のみ (信頼登録する場合に使う)
 
-gh secret set WINDOWS_CERTIFICATE < <(base64 -w0 cert.pfx)
-gh secret set WINDOWS_CERTIFICATE_PASSWORD < pfx-password.txt
+base64 -w0 cert.pfx | gh secret set WINDOWS_CERTIFICATE -R virtual-hippo/hello-tauri2
+gh secret set WINDOWS_CERTIFICATE_PASSWORD -R virtual-hippo/hello-tauri2 < pfx-password.txt
+)
+```
+
+`key.pem` は暗号化されていない秘密鍵で、`cert.pfx` と `pfx-password.txt` が揃っても秘密鍵を取り出せる。WSL のバックアップや export にはこれらも含まれる。証明書は作り直せるので、Secret の登録後にローカルで保管する必要がなければ削除する。
+
+```sh
+rm ~/.secrets/hello-tauri/{key.pem,cert.pfx,cert.pfx.b64,pfx-password.txt}
 ```
